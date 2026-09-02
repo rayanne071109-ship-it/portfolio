@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rayanne — Engenharia de Dados</title>
+<meta name="description" content="Portfólio de engenharia de dados: pipelines Bronze/Silver/Gold, análise multi-cloud e automações.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B1220;
+    --bg-raised: #0F1830;
+    --ink: #E7ECF5;
+    --ink-dim: #8C99B8;
+    --line: #23304F;
+    --line-strong: #34456E;
+    --cyan: #5EEAD4;
+    --bronze: #C88A4F;
+    --silver: #AEB9CC;
+    --gold: #E0BE6B;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+
+  h1,h2,h3{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .mono{
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  a { color: inherit; }
+
+  .wrap{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* corner ticks — reused blueprint device on framed elements */
+  .ticked{
+    position: relative;
+  }
+  .ticked::before, .ticked::after,
+  .ticked .tick-br, .ticked .tick-bl{
+    content:"";
+    position:absolute;
+    width:14px; height:14px;
+    border: 1.5px solid var(--cyan);
+    opacity: 0.85;
+  }
+  .ticked::before{ top:-1px; left:-1px; border-right:none; border-bottom:none; }
+  .ticked::after{ top:-1px; right:-1px; border-left:none; border-bottom:none; }
+  .ticked .tick-bl{ bottom:-1px; left:-1px; border-right:none; border-top:none; }
+  .ticked .tick-br{ bottom:-1px; right:-1px; border-left:none; border-top:none; }
+
+  /* ---------- top bar ---------- */
+  header.topbar{
+    position: sticky; top:0; z-index: 20;
+    background: rgba(11,18,32,0.86);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner{
+    display:flex; align-items:center; justify-content: space-between;
+    padding: 18px 32px;
+    max-width: 1080px; margin: 0 auto;
+  }
+  .brand{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.02em;
+  }
+  .brand b{ color: var(--ink); font-weight:500; }
+  nav.topnav{ display:flex; gap: 28px; }
+  nav.topnav a{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    text-decoration:none;
+    color: var(--ink-dim);
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  nav.topnav a:hover{ color: var(--cyan); border-color: var(--cyan); }
+
+  /* ---------- hero ---------- */
+  section.hero{
+    padding: 96px 0 80px;
+    border-bottom: 1px solid var(--line);
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 300px 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+  .photo-frame{
+    padding: 20px;
+    border: 1px solid var(--line-strong);
+  }
+  .photo-frame img{
+    width:100%; display:block;
+    filter: grayscale(15%) contrast(1.03);
+  }
+  .frame-caption{
+    display:flex; justify-content:space-between;
+    margin-top: 10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  .kicker{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--cyan);
+    margin-bottom: 18px;
+    display:flex; align-items:center; gap: 10px;
+  }
+  .kicker .rule{ width:32px; height:1px; background: var(--cyan); display:inline-block; }
+
+  h1.name{
+    font-size: clamp(38px, 5vw, 58px);
+    line-height: 1.05;
+  }
+  .role-line{
+    margin-top: 14px;
+    font-size: 19px;
+    color: var(--ink-dim);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+  }
+  .role-line .arrow-swap{ color: var(--ink); }
+
+  .lede{
+    margin-top: 26px;
+    max-width: 62ch;
+    color: var(--ink);
+    font-size: 16px;
+  }
+
+  .hero-actions{
+    margin-top: 34px;
+    display:flex; gap: 14px; flex-wrap: wrap;
+  }
+  .btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 12px 20px;
+    border: 1px solid var(--line-strong);
+    text-decoration:none;
+    color: var(--ink);
+    transition: border-color .15s, color .15s;
+  }
+  .btn.primary{
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+  .btn:hover{ border-color: var(--cyan); color: var(--cyan); }
+
+  /* ---------- section shell ---------- */
+  section{ padding: 72px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom: 40px;
+    flex-wrap: wrap; gap: 10px;
+  }
+  .section-head h2{ font-size: 28px; }
+  .section-num{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+
+  /* ---------- stack ---------- */
+  .stack-table{
+    width:100%;
+    border-collapse: collapse;
+  }
+  .stack-table tr{ border-bottom: 1px solid var(--line); }
+  .stack-table tr:first-child{ border-top: 1px solid var(--line); }
+  .stack-table td{
+    padding: 14px 8px;
+    vertical-align: top;
+  }
+  .stack-cat{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--cyan);
+    width: 220px;
+    padding-top: 16px;
+  }
+  .stack-items{ font-size: 15px; color: var(--ink); }
+  .stack-items span{ color: var(--ink-dim); }
+  .stack-items .sep{ color: var(--line-strong); margin: 0 10px; }
+
+  /* ---------- projects ---------- */
+  .projects{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .project{
+    background: var(--bg);
+    padding: 28px;
+    display:flex; flex-direction:column;
+    gap: 14px;
+  }
+  .badge-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .badge{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 9px;
+    border: 1px solid currentColor;
+  }
+  .badge.bronze{ color: var(--bronze); }
+  .badge.silver{ color: var(--silver); }
+  .badge.gold{ color: var(--gold); }
+  .badge.status{ color: var(--cyan); }
+
+  .project h3{ font-size: 19px; }
+  .project p{ margin:0; color: var(--ink-dim); font-size: 14.5px; }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap: 8px; margin-top: auto; padding-top: 10px; }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    border: 1px solid var(--line-strong);
+    padding: 3px 8px;
+  }
+
+  .project-link{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--cyan);
+    text-decoration:none;
+    border-bottom: 1px solid transparent;
+  }
+  .project-link:hover{ border-color: var(--cyan); }
+
+  /* ---------- trajetoria ---------- */
+  .timeline{
+    position:relative;
+    padding-left: 28px;
+  }
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left: 5px; top: 6px; bottom: 6px;
+    width: 1px;
+    background: var(--line-strong);
+  }
+  .tl-item{
+    position:relative;
+    padding-bottom: 34px;
+  }
+  .tl-item:last-child{ padding-bottom: 0; }
+  .tl-item::before{
+    content:"";
+    position:absolute;
+    left: -28px; top: 4px;
+    width: 11px; height: 11px;
+    background: var(--bg);
+    border: 2px solid var(--cyan);
+  }
+  .tl-period{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+  .tl-item h3{ font-size: 17px; margin-top: 4px; }
+  .tl-item p{ margin: 6px 0 0; color: var(--ink-dim); font-size: 14.5px; max-width: 60ch; }
+
+  /* ---------- contact / title block ---------- */
+  .titleblock{
+    border: 1px solid var(--line-strong);
+  }
+  .tb-top{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .tb-cell{
+    padding: 28px 30px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .tb-cell:last-child{ border-right:none; }
+  .tb-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+  }
+  .tb-value{ font-size: 16px; }
+  .tb-value a{ color: var(--cyan); text-decoration:none; }
+  .tb-value a:hover{ text-decoration: underline; }
+
+  .tb-bottom{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .tb-bottom .tb-cell{ border-bottom:none; }
+  .tb-bottom .tb-cell:last-child{ border-right:none; }
+
+  footer{
+    padding: 30px 0 50px;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+
+  @media (max-width: 720px){
+    .hero-grid{ grid-template-columns: 1fr; }
+    .photo-frame{ max-width: 240px; }
+    .tb-top, .tb-bottom{ grid-template-columns: 1fr; }
+    .tb-cell{ border-right:none; }
+    nav.topnav{ display:none; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">RAYANNE<b>.DADOS</b> <span style="opacity:.5">// v1.0</span></div>
+    <nav class="topnav">
+      <a href="#stack">Stack</a>
+      <a href="#projetos">Projetos</a>
+      <a href="#trajetoria">Trajetória</a>
+      <a href="#contato">Contato</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="photo-frame ticked">
+        <span class="tick-bl"></span><span class="tick-br"></span>
+        <img src="assets/foto-perfil.jpg" alt="Foto de Rayanne">
+      </div>
+      <div class="frame-caption">
+        <span>FIG. 01 — PERFIL</span>
+        <span>ESC. 1:1</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="kicker"><span class="rule"></span>PORTFÓLIO TÉCNICO</div>
+      <h1 class="name">Rayanne</h1>
+      <p class="role-line">Engenharia Civil <span class="arrow-swap">→</span> Engenharia de Dados</p>
+      <p class="lede">
+        Migrando plantas e memoriais de cálculo para pipelines e camadas de dados.
+        Construo soluções de ponta a ponta — de scripts de ETL a dashboards e bots —
+        estruturadas em Bronze, Silver e Gold, com o mesmo rigor de quem projetava estruturas.
+      </p>
+      <div class="hero-actions">
+        <a class="btn primary" href="#projetos">Ver projetos</a>
+        <a class="btn" href="https://github.com/rayanne071109-ship-it" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="#contato">Contato</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Stack</h2>
+      <span class="section-num mono">SEÇÃO 01 / LEGENDA</span>
+    </div>
+
+    <table class="stack-table">
+      <tr>
+        <td class="stack-cat">Linguagens &amp; dados</td>
+        <td class="stack-items">Python <span class="sep">·</span> SQL <span class="sep">·</span> Pandas <span class="sep">·</span> <span>ETL / pipelines em camadas</span></td>
+      </tr>
+      <tr>
+        <td class="stack-cat">Cloud &amp; infraestrutura</td>
+        <td class="stack-items">AWS <span class="sep">·</span> Azure <span class="sep">·</span> GCP <span class="sep">·</span> Docker <span class="sep">·</span> <span>SSH / backup remoto</span></td>
+      </tr>
+      <tr>
+        <td class="stack-cat">Aplicações &amp; interfaces</td>
+        <td class="stack-items">Streamlit <span class="sep">·</span> Flask <span class="sep">·</span> <span>Webhooks</span></td>
+      </tr>
+      <tr>
+        <td class="stack-cat">IA &amp; automação</td>
+        <td class="stack-items">LLM via Groq <span class="sep">·</span> WAHA (WhatsApp API) <span class="sep">·</span> <span>tradução de dados calculados em linguagem simples</span></td>
+      </tr>
+      <tr>
+        <td class="stack-cat">Domínio</td>
+        <td class="stack-items">Genética bovina (GPTA/DEP) <span class="sep">·</span> <span>precificação multi-cloud</span> <span class="sep">·</span> automação financeira pessoal</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<section id="projetos">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Projetos</h2>
+      <span class="section-num mono">SEÇÃO 02 / 03 FOLHAS</span>
+    </div>
+
+    <div class="projects">
+
+      <div class="project">
+        <div class="badge-row">
+          <span class="badge status">EM EXPANSÃO</span>
+        </div>
+        <h3>Comparador Multi-Cloud</h3>
+        <p>
+          ETL + dashboard em Streamlit que compara preços on-demand de VMs entre
+          AWS EC2 e Azure — em expansão para incluir GCP como terceiro provedor.
+          Reconstruído do zero após perda dos arquivos originais.
+        </p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">Streamlit</span>
+          <span class="tag">AWS</span>
+          <span class="tag">Azure</span>
+          <span class="tag">GCP</span>
+        </div>
+        <a class="project-link" href="https://github.com/rayanne071109/aws-price-etl" target="_blank" rel="noopener">github.com/rayanne071109/aws-price-etl →</a>
+      </div>
+
+      <div class="project">
+        <div class="badge-row">
+          <span class="badge bronze">BRONZE</span>
+          <span class="badge silver">SILVER</span>
+          <span class="badge gold">GOLD</span>
+        </div>
+        <h3>Recomendação Genética de Sêmen Bovino</h3>
+        <p>
+          Motor de recomendação baseado em índices GPTA/DEP, consolidando 927 touros
+          de quatro centrais genéticas em uma camada Silver única. Camada Gold gera
+          recomendações de melhor ganho e maior confiabilidade, traduzidas em
+          linguagem simples por um LLM que nunca inventa números — só reformula o
+          que o motor já calculou.
+        </p>
+        <div class="tag-row">
+          <span class="tag">Python</span>
+          <span class="tag">Streamlit</span>
+          <span class="tag">Groq LLM</span>
+          <span class="tag">Bronze/Silver/Gold</span>
+        </div>
+        <a class="project-link" href="#contato">Solicitar acesso ao repositório →</a>
+      </div>
+
+      <div class="project">
+        <div class="badge-row">
+          <span class="badge status">EM PRODUÇÃO</span>
+        </div>
+        <h3>Bot de Despesas via WhatsApp</h3>
+        <p>
+          Bot construído com WAHA (WhatsApp HTTP API) e webhook em Flask que registra
+          despesas a partir de mensagens de texto e alimenta um dashboard automaticamente.
+          Já em produção; ajuste em andamento para restringir as respostas a um grupo
+          específico.
+        </p>
+        <div class="tag-row">
+          <span class="tag">Flask</span>
+          <span class="tag">WAHA</span>
+          <span class="tag">Docker</span>
+          <span class="tag">Webhook</span>
+        </div>
+        <a class="project-link" href="#contato">Solicitar acesso ao repositório →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="trajetoria">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Trajetória</h2>
+      <span class="section-num mono">SEÇÃO 03 / LINHA DO TEMPO</span>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-period mono">ORIGEM</div>
+        <h3>Engenharia Civil</h3>
+        <p>Formação em plantas, memoriais de cálculo e estruturas — a base do raciocínio técnico que hoje aplico a dados.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-period mono">TRANSIÇÃO</div>
+        <h3>Primeiros projetos de dados</h3>
+        <p>Início em ETL e dashboards, adotando a arquitetura em camadas (Bronze/Silver/Gold) como método de trabalho.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-period mono">ATUAL</div>
+        <h3>Análise e Desenvolvimento de Sistemas(cursando)</h3>
+        <p>Pipelines multi-cloud, motores de recomendação com dados reais de dois anos e automações ponta a ponta com bots e LLMs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contato">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Contato</h2>
+      <span class="section-num mono">SEÇÃO 04 / SELO</span>
+    </div>
+
+    <div class="titleblock">
+      <div class="tb-top">
+        <div class="tb-cell">
+          <div class="tb-label">NOME</div>
+          <div class="tb-value">Rayanne</div>
+        </div>
+        <div class="tb-cell">
+          <div class="tb-label">FUNÇÃO</div>
+          <div class="tb-value">Engenharia de Dados</div>
+        </div>
+      </div>
+      <div class="tb-bottom">
+        <div class="tb-cell">
+          <div class="tb-label">E-MAIL</div>
+          <div class="tb-value"><a href="mailto:seu-email@exemplo.com">rayanne071109@gmail.com</a></div>
+        </div>
+        <div class="tb-cell">
+          <div class="tb-label">GITHUB</div>
+          <div class="tb-value"><a href="https://github.com/rayanne071109-ship-it" target="_blank" rel="noopener">rayanne071109</a></div>
+        </div>
+        <div class="tb-cell">
+          <div class="tb-label">LINKEDIN</div>
+          <div class="tb-value"><a href="#">https://www.linkedin.com/in/rayannerosacloud/</a></div>
+        </div>
+        <div class="tb-cell">
+          <div class="tb-label">LOCAL</div>
+          <div class="tb-value">Patos de Minas, MG</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  DESENHADO EM HTML/CSS · SEM BUILD · PRONTO PARA GITHUB PAGES
+</footer>
+
+</body>
+</html>
